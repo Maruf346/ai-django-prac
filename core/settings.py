@@ -149,11 +149,34 @@ BASE_URL = os.getenv('BASE_URL', 'http://localhost:8000')
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 
 
+# Rest Framework settings
+REST_FRAMEWORK = {
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 16,
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    
+}
+
+
 # drf-spectacular settings
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Cookstagram-Kids API',
-    'DESCRIPTION': 'API for the kids cooking app',
-    'VERSION': '1.0.0',
+    'TITLE': 'Practice API',
+    'DESCRIPTION': 'API for practice code',
+    'VERSION': '1.0.1',
     'TERMS_OF_SERVICE': 'https://www.google.com/policies/terms/',
     'CONTACT': {'email': 'maruf.bshs@gmail.com'},
     'LICENSE': {'name': 'BSD License'},
