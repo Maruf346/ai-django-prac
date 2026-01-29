@@ -68,4 +68,4 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
     
     def __str__(self):
-        return f"Name: {self.first_name if self.first_name else 'Unknown'} | Email: {self.email}"
+        return f"Name: {self.first_name if self.first_name else 'John Doe'} | Email: {self.email}"

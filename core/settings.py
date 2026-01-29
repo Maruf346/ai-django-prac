@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     
 ]
 
+SITE_ID = 1
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -145,7 +147,7 @@ STRIPE_YEARLY_PRICE_ID = os.getenv('STRIPE_YEARLY_PRICE_ID')
 
 
 # Application URLs
-BASE_URL = os.getenv('BASE_URL', 'http://localhost:8000')
+BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000/')
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 
 
