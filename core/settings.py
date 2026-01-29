@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django_filters',
     
     # Local apps
-    'auth',
+    'user',
     'api',
     
 ]
@@ -104,6 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'auth.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
