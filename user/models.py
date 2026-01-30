@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+import uuid
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -45,6 +46,7 @@ class User(AbstractUser):
         message="Phone number must be entered in Bangladeshi format: '+8801XXXXXXXXX'"
     )
     
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = None  # Remove username field
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -59,6 +61,7 @@ class User(AbstractUser):
     zip_code = models.IntegerField(null=True, blank=True)
     country = models.CharField(max_length=100, null=True, blank=True)
     total_spent = models.FloatField(default=0.0)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
