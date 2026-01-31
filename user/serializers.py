@@ -68,7 +68,7 @@ class UserRegisterSerializer(ModelSerializer):
         
         return user
     
-class UserLoginSerializer(serializers.ModelSerializer):
+class UserLoginSerializer(ModelSerializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(
         write_only=True,
@@ -107,3 +107,13 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
         data['user'] = user
         return data
+
+
+class UserAddressSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = {
+            'street', 'city', 'zip_code', 'country'
+        }
+        read_only_fields = fields
+        
