@@ -153,11 +153,12 @@ FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 
 # Rest Framework settings
 REST_FRAMEWORK = {
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
-    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        #'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
@@ -194,11 +195,11 @@ SPECTACULAR_SETTINGS = {
 
 # Jazzmin settings
 JAZZMIN_SETTINGS = {
-    "site_title": "Cookstagram-Kids Admin",
-    "site_header": "Cookstagram-Kids",
-    "site_brand": "Cookstagram-Kids",
-    "welcome_sign": "Welcome to the Cookstagram-Kids Admin Panel",
-    "copyright": "Cookstagram-Kids © 2026",
+    "site_title": "Django Admin",
+    "site_header": "myDjango",
+    "site_brand": "myDjango",
+    "welcome_sign": "Welcome to the myDjango Admin Panel",
+    "copyright": "myDjango © 2026",
     "user_avatar": None,
     "icons": {
         "auth": "fas fa-users-cog",
