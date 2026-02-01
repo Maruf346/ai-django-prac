@@ -124,3 +124,11 @@ class PublicAddressView(RetrieveAPIView):
     serializer_class = UserAddressSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'id'
+    
+
+class UserStatsViewSet(ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = UserStatsSerializer
+    ordering = ["-total_spent"]
+    lookup_field = 'id'

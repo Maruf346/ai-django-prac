@@ -117,4 +117,11 @@ class UserAddressSerializer(ModelSerializer):
             'street', 'city', 'zip_code', 'country'
         ]
         read_only_fields = fields
-        
+
+
+class UserStatsSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id', 'total_spent'
+        ]        
