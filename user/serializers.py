@@ -33,7 +33,7 @@ class UserProfileSerializer(ModelSerializer):
             'bio', 'street', 'city', 
             'zip_code', 'country',
         ]
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'email']
         
         
 class UserSignupSerializer(ModelSerializer):

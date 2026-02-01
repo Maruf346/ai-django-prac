@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveAPIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
@@ -7,6 +8,7 @@ from django.contrib.auth import login, logout, get_user_model
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import *
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 
 User = get_user_model()
@@ -71,6 +73,9 @@ class UserLoginView(APIView):
         status = status.HTTP_200_OK)
         
 
+@extend_schema(
+    responses={205: OpenApiResponse(description="Logged out successfully")}
+)
 class UserLogoutView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = None
@@ -97,3 +102,19 @@ class UserLogoutView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+            
+            
+class MyProfileView(RetrieveUpdateDestroyAPIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self):
+        return self.request.user
+    
+    
+class PublicProfileView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id'
+    

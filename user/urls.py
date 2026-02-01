@@ -12,5 +12,7 @@ urlpatterns = [
     
     path('signup/', UserSignupView.as_view(), name='signup'),
     path('login/', UserLoginView.as_view(), name='login'),
-    path('logout/', UserLogoutView.as_view(), name='logout')
+    path('logout/', UserLogoutView.as_view(), name='logout'),
+    path('me/', MyProfileView.as_view(), name='me'),
+    path('profile/<uuid:id>/', PublicProfileView.as_view(), name='profile')
 ]
