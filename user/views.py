@@ -16,7 +16,7 @@ User = get_user_model()
 
 class UserListViewSet(ReadOnlyModelViewSet):
     queryset = User.objects.all()
-    permission_classes = [IsAdminUser]
+    permission_classes = [AllowAny]
     serializer_class = UserListSerializer
     ordering_fields = ["created_at", "updated_at", "email", "first_name", "last_name", "total_spent"]
     filterset_fields = ["is_active", "gender"]
@@ -118,3 +118,9 @@ class PublicProfileView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     lookup_field = 'id'
     
+    
+class PublicAddressView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserAddressSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id'

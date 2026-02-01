@@ -68,6 +68,7 @@ class UserSignupSerializer(ModelSerializer):
         
         return user
     
+    
 class UserLoginSerializer(ModelSerializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(
@@ -112,8 +113,8 @@ class UserLoginSerializer(ModelSerializer):
 class UserAddressSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = {
+        fields = [
             'street', 'city', 'zip_code', 'country'
-        }
+        ]
         read_only_fields = fields
         
