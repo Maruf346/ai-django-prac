@@ -36,7 +36,7 @@ class UserProfileSerializer(ModelSerializer):
         read_only_fields = ['id']
         
         
-class UserRegisterSerializer(ModelSerializer):
+class UserSignupSerializer(ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8, required=True, style={'input_type': 'password'})
     confirm_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
     

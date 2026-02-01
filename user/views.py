@@ -1,12 +1,51 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
-from django.contrib.auth import login, logout
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
+from django.contrib.auth import login, logout, get_user_model
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import *
 
+
+User = get_user_model()
+
+
+class UserListViewSet(ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    permission_classes = [IsAdminUser]
+    serializer_class = UserListSerializer
+    ordering_fields = ["created_at", "updated_at", "email", "first_name", "last_name", "total_spent"]
+    filterset_fields = ["is_active", "gender"]
+    ordering = ["-created_at"]
+    lookup_field = 'id'
+    
+ 
+class UserSignupView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = UserSignupSerializer
+    
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        
+        user = serializer.save()
+        
+        refresh = RefreshToken.for_user(user)
+        
+        return Response(
+            {
+                'message': 'Account created successfully...',
+                'user': UserProfileSerializer(user).data,
+                'tokens': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+       
 
 class UserLoginView(APIView):
     permission_classes = [AllowAny]
