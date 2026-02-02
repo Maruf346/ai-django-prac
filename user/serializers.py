@@ -5,6 +5,14 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model, authenticate
 
+# OAuth2 imports
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken
+import requests as req
+from django.core.files.base import ContentFile
+
 
 User = get_user_model()
 
@@ -125,3 +133,65 @@ class UserStatsSerializer(ModelSerializer):
         fields = [
             'id', 'total_spent'
         ]        
+        
+
+class GoogleOAuthSerializer(serializers.Serializer):
+    id_token = serializers.CharField(required=True)
+    
+    def validate(self, attrs):
+        token = attrs.get('id_token')
+        
+        try:
+            google_user = id_token.verify_oauth2_token(
+                token,
+                requests.Request(),
+                settings.GOOGLE_CLIENT_ID
+            )
+        except Exception:
+            raise serializers.ValidationError("Invalid or expired Google token")
+        
+        # Check if email is verified
+        if not google_user.get('email_verified'):
+            raise serializers.ValidationError('Google email not verified')
+        
+        # Extarct data from google response
+        email = google_user.get('email')
+        first_name = google_user.get('given_name', '')
+        last_name = google_user.get('family_name', '')
+        picture = google_user.get('picture', '')
+        
+        user, created = User.objects.get_or_create(
+            email = email,
+            defaults={
+                'first_name': first_name,
+                'last_name': last_name,
+                'is_active': True,
+            },
+        )
+                
+        if created:
+            user.set_unusable_password()
+            if picture:
+                try:
+                    response = req.get(picture, timeout=5)
+                    response.raise_for_status()
+                
+                    if response.status_code == 200:
+                        file_name = f'{user.id}_google.jpg'
+                        user.profile_picture.save(
+                            file_name,
+                            ContentFile(response.content),
+                            save=False
+                        )
+                except Exception:
+                    pass
+            user.save()
+            
+        refresh = RefreshToken.for_user(user)
+        
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'user': UserProfileSerializer(user).data,
+            'is_new_user': created,
+        }
