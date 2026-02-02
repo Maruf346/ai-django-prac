@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import User
+from .models import User, AuthProvider
 from rest_framework import serializers
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -159,6 +159,7 @@ class GoogleOAuthSerializer(serializers.Serializer):
         first_name = google_user.get('given_name', '')
         last_name = google_user.get('family_name', '')
         picture = google_user.get('picture', '')
+        provider_id = google_user.get('sub'),
         
         user, created = User.objects.get_or_create(
             email = email,
@@ -166,6 +167,8 @@ class GoogleOAuthSerializer(serializers.Serializer):
                 'first_name': first_name,
                 'last_name': last_name,
                 'is_active': True,
+                'provider': AuthProvider.GOOGLE,
+                'provider_id': provider_id,
             },
         )
                 

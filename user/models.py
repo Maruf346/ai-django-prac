@@ -3,6 +3,16 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import uuid
 
+
+class AuthProvider(models.TextChoices):
+    SELF = 'self', 'Self'
+    GOOGLE = 'google', 'Google'
+    GITHUB = 'github', 'Github'
+    FACEBOOK = 'facebook', 'Facebook'
+    APPLE = 'apple', 'Apple'
+    LINKEDIN = 'linkedin', 'LinkedIn'
+    
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
     
@@ -35,6 +45,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     
+    # Older approach for choice fields
     GENDER_CHOICES = [
         ('male', 'Male'),
         ('female', 'Female'),
@@ -64,6 +75,18 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # provider details
+    provider = models.CharField(
+        max_length=20,
+        choices=AuthProvider.choices,
+        default=AuthProvider.SELF
+    )
+    provider_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
     
     objects = UserManager()
     
