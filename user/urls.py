@@ -11,6 +11,7 @@ router.register('stats', UserStatsViewSet, basename='stats')
 urlpatterns = [
     path("", include(router.urls)),
     
+    path('auth/google/', GoogleOAuthView.as_view(), name='google-login'),
     path('signup/', UserSignupView.as_view(), name='signup'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),

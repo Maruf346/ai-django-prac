@@ -168,7 +168,7 @@ class GoogleOAuthSerializer(serializers.Serializer):
                 'last_name': last_name,
                 'is_active': True,
                 'provider': AuthProvider.GOOGLE,
-                'provider_id': provider_id,
+                'provider_id': provider_id
             },
         )
                 
@@ -190,6 +190,12 @@ class GoogleOAuthSerializer(serializers.Serializer):
                     pass
             user.save()
             
+        if not created:
+            if user.provider == AuthProvider.SELF:
+                raise serializers.ValidationError('Account already exists. Please login with email and password')
+            elif user.provider != AuthProvider.GOOGLE:
+                raise serializers.ValidationError(f'Account already exists. Please login with {user.provider}.')
+        
         refresh = RefreshToken.for_user(user)
         
         return {
