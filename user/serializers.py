@@ -214,7 +214,7 @@ class GoogleOAuthSerializer(serializers.Serializer):
 
 
 class GitHubOAuthSerializer(serializers.Serializer):
-    code = serializers.CharField(requried=True)
+    code = serializers.CharField(required=True)
     
     def validate(self, attrs):
         code = attrs.get('code')
