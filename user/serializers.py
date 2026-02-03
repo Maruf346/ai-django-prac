@@ -151,11 +151,16 @@ class GoogleOAuthSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid or expired Google token")
         
         # Check if email is verified
-        if not google_user.get('email_verified'):
-            raise serializers.ValidationError('Google email not verified')
+        # if not google_user.get('email_verified'):
+        #     raise serializers.ValidationError('Google email not verified')
         
         # Extarct data from google response
         email = google_user.get('email')
+        if not email:
+            raise serializers.ValidationError(
+                "Google account has no email. Please use another login method."
+            )
+            
         first_name = google_user.get('given_name', '')
         last_name = google_user.get('family_name', '')
         picture = google_user.get('picture', '')
@@ -199,8 +204,10 @@ class GoogleOAuthSerializer(serializers.Serializer):
         refresh = RefreshToken.for_user(user)
         
         return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
             'user': UserProfileSerializer(user).data,
             'is_new_user': created,
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token)
+            }
         }
