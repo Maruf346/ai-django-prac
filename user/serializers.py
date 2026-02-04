@@ -392,3 +392,91 @@ class FacebookOAuthSerializer(serializers.Serializer):
                 'access': str(refresh.access_token)
             }
         }
+        
+        
+class LinkedInOAuthSerializer(serializers.Serializer):
+    code = serializers.CharField(required=True)
+    
+    def validate(self, attrs):
+        code = attrs.get('code')
+        
+        # Exchange code to get access token
+        token_url = 'https://www/linkedin.com/oauth/v2/accessToken'
+        token_data = {
+            'grant_type': 'authorization_code',
+            'code': code,
+            'redirect_uri': settings.LINKEDIN_REDIRECT_URI,
+            'client_id': settings.LINKEDIN_CLIENT_ID,
+            'client_secret': settings.LINKEDIN_CLIENT_SECRET
+        }
+        
+        token_response = req.post(token_url, data=token_data)
+        
+        if token_response.status_code != 200:
+            raise serializers.ValidationError('Invalid LinkedIn authorization code')
+        
+        token_data = token_response.json()
+        access_token = token_data.get('access_token')
+        
+        if not access_token:
+            raise serializers.ValidationError('Failed to obtain access token')
+        
+        # Use token to get LinkedIn user info
+        url = 'https://api.linkedin.com/v2/userinfo'
+        headers = {'Authorization': f'Bearer {access_token}'}
+        
+        response = req.get(url, headers=headers)
+        
+        if response.status_code != 200:
+            raise serializers.ValidationError('Failed to fetch LinkedIn user data')
+        
+        # Extracting user info from response
+        linkedin_user = response.json()
+        
+        email = linkedin_user.get('email')
+        if not email:
+            raise serializers.ValidationError('LinkedIn account has no email. Please use another login method.')
+        
+        first_name = linkedin_user.get('given_name', '')
+        last_name = linkedin_user.get('family_name', '')
+        picture = linkedin_user.get('picture')
+        provider_id = linkedin_user.get('sub')
+        
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                'first_name': first_name,
+                'last_name': last_name,
+                'is_active': True,
+                'provider': AuthProvider.LINKEDIN,
+                'provider_id': provider_id
+            }
+        )
+        
+        if created:
+            user.set_unusable_password()
+            
+            if picture:
+                try:
+                    pic = req.get(picture, timeout=5)
+                    pic.raise_for_status()
+                    
+                    user.profile_picture.save(
+                        f'{user.id}_linkedIn.jpg',
+                        ContentFile(pic.content),
+                        save=False
+                    )
+                except Exception:
+                    pass
+            user.save()
+            
+        refresh = RefreshToken.for_user(user)
+        
+        return{
+            'user': UserProfileSerializer(user).data,
+            'is_new_user': created,
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token)
+            }
+        }

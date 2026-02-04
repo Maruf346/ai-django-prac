@@ -126,6 +126,11 @@ FACEBOOK_APP_ID = os.getenv('FACEBOOK_APP_ID')
 FACEBOOK_APP_SECRET = os.getenv('FACEBOOK_APP_SECRET')
 FACEBOOK_GRAPH_API_URL = os.getenv('FACEBOOK_GRAPH_API_URL')
 
+# LinkedIn OAuth
+LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
+LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
+LINKEDIN_REDIRECT_URI = os.getenv('LINKEDIN_REDIRECT_URI')
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
