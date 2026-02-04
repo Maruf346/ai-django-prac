@@ -121,6 +121,11 @@ GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID')
 GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET')
 GITHUB_REDIRECT_URI = os.getenv('GITHUB_REDIRECT_URI')
 
+# Facebook OAuth
+FACEBOOK_APP_ID = os.getenv('FACEBOOK_APP_ID')
+FACEBOOK_APP_SECRET = os.getenv('FACEBOOK_APP_SECRET')
+FACEBOOK_GRAPH_API_URL = os.getenv('FACEBOOK_GRAPH_API_URL')
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

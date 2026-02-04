@@ -314,3 +314,81 @@ class GitHubOAuthSerializer(serializers.Serializer):
         }
         
 
+class FacebookOAuthSerializer(serializers.Serializer):
+    access_token = serializers.CharField(required=True)
+    
+    def validate(self, attrs):
+        access_token = attrs.get('access_token')
+        
+        # Receive user data from Facebook
+        fields = 'id,email,first_name,last_name,picture.type(large)'
+        url = (
+            f'{settings.FACEBOOK_GRAPH_API_URL}/me'
+            f'?fields={fields}&access_token={access_token}'
+        )
+        response = req.get(url)
+        
+        if response.status_code != 200:
+            raise serializers.ValidationError('Invalid Facebook access token')
+        
+        # Storing user data in a variable
+        fb_user = response.json()
+        
+        # Extracting user data
+        email = fb_user.get('email')
+        if not email:
+            raise serializers.ValidationError('Facebook account has no eamil. Please try another login method')
+        
+        first_name = fb_user.get('first_name', '')
+        last_name = fb_user.get('last_name', '')
+        provider_id = fb_user.get('id')
+        picture = (
+            fb_user.get('picture', {})
+                .get('data', {})
+                .get('url')
+        )
+        
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                'first_name': first_name,
+                'last_name': last_name,
+                'is_active': True,
+                'provider': AuthProvider.FACEBOOK,
+                'provider_id': provider_id
+            }
+        )
+        
+        if created:
+            user.set_unusable_password()
+            
+            if picture:
+                try:
+                    pic = req.get(picture, timeout=5)
+                    pic.raise_for_status()
+                    
+                    user.profile_picture.save(
+                        f'{user.id}_facebook.jpg',
+                        ContentFile(pic.content),
+                        save=False
+                    )
+                except Exception:
+                    pass
+            user.save()
+            
+        if not created:
+            if user.provider == AuthProvider.SELF:
+                raise serializers.ValidationError('Account already exists. Please login with email and password')
+            elif user.provider != AuthProvider.FACEBOOK:
+                raise serializers.ValidationError(f'Account already exists. Please login with {user.provider}.')
+            
+        refresh = RefreshToken.for_user(user)
+        
+        return {
+            'user': UserProfileSerializer(user).data,
+            'is_new_user': created,
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token)
+            }
+        }
