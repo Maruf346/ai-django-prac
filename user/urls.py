@@ -14,6 +14,7 @@ urlpatterns = [
     # OAuth2 logins
     path('auth/google/', GoogleOAuthView.as_view(), name='google-login'),
     path('auth/github/', GitHubOAuthView.as_view(), name='github-login'),
+    path('auth/facebook/', FacebookOAuthView.as_view(), name='facebook-login'),
     
     # User endpoints
     path('signup/', UserSignupView.as_view(), name='signup'),

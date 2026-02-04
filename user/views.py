@@ -155,3 +155,14 @@ class GitHubOAuthView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+    
+    
+class FacebookOAuthView(GenericAPIView):
+    serializer_class = FacebookOAuthSerializer
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
