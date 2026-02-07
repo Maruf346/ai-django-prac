@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
     'django_filters',
+    'sslserver',
     
     # Local apps
     'user',
@@ -119,6 +120,8 @@ SITE_ID = 1
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI')
+FRONTEND_LOGIN_ERROR_URL = os.getenv('FRONTEND_LOGIN_ERROR_URL')
+FRONTEND_LOGIN_SUCCESS_URL = os.getenv('FRONTEND_LOGIN_SUCCESS_URL')
 
 # GitHub OAuth Settings
 GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID')

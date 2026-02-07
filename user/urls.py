@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from .views import *
+from .views2 import *
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
@@ -13,6 +14,9 @@ urlpatterns = [
     
     # OAuth2 logins
     path('auth/google/', GoogleOAuthView.as_view(), name='google-login'),
+    path('auth/google2/login/', GoogleLoginRedirectView.as_view(), name='google-login2'),
+    path('auth/google2/callback/', GoogleOAuthCallbackView.as_view(), name='google-login2-callback'),
+    
     path('auth/github/', GitHubOAuthView.as_view(), name='github-login'),
     path('auth/facebook/', FacebookOAuthView.as_view(), name='facebook-login'),
     path('auth/linkedin/', LinkedInOAuthView.as_view(), name='linkedin-login'),
