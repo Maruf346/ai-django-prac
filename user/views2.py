@@ -87,3 +87,49 @@ class GoogleOAuthCallbackView(APIView):
         #     f'is_new={serializer.validated_data['is_new_user']}'
         # )
         
+        
+class GitHubOAuthLoginRedirectView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        params = {
+            'client_id': settings.GITHUB_CLIENT_ID,
+            'redirect_uri': settings.GITHUB_REDIRECT_URI,
+            'scope': 'read: user user:email',
+            'allow_signup': 'true'
+        }
+        
+        query = '&'.join(f'{k}={v}' for k, v in params.items())
+        return redirect(f'https://github.com/login/oauth/authorize?{query}')
+    
+    
+class GitHubOAuthCallbackView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        code = request.GET.get('code')
+        
+        if not code:
+            return redirect(
+                f'{settings.FRONTEND_LOGIN_ERROR_URL}?error=Github login failed'
+            )
+        
+        try:
+            serializer = GitHubOAuthSerializer(data={'code':code})
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return redirect (
+                f'{settings.FRONTEND_LOGIN_ERROR_URL}'
+                f'?error={str(e.details[0])}'
+            )
+            
+        return Response(serializer.validated_data)    # comment this out when frontend is ready
+    
+        # Uncomment below to redirect to frontend with tokens in query params
+        # return redirect(
+        #     f'{settings.FRONTEND_LOGIN_SUCCESS_URL}'
+        #     f'?access={serializer.validated_data['tokens']['access']}'
+        #     f'&refresh={serializer.validated_data['tokens']['refresh']}'
+        #     f'&is_new={serializer.validated_data['is_new_user']}'
+        # )
+            

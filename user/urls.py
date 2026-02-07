@@ -18,6 +18,9 @@ urlpatterns = [
     path('auth/google2/callback/', GoogleOAuthCallbackView.as_view(), name='google-login2-callback'),
     
     path('auth/github/', GitHubOAuthView.as_view(), name='github-login'),
+    path('auth/github2/login', GitHubOAuthLoginRedirectView.as_view(), name='github-login2'),
+    path('auth/github2/callback', GitHubOAuthCallbackView.as_view(), name='github-login2-callback'),
+    
     path('auth/facebook/', FacebookOAuthView.as_view(), name='facebook-login'),
     path('auth/linkedin/', LinkedInOAuthView.as_view(), name='linkedin-login'),
     
