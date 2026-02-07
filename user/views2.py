@@ -17,7 +17,7 @@ class GoogleLoginRedirectView(APIView):
                     'client_id': settings.GOOGLE_CLIENT_ID,
                     'client_secret': settings.GOOGLE_CLIENT_SECRET,
                     'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
-                    'token_uri': 'https://oauth2.googleapis.com/token',
+                    'token_uri': 'https://oauth2.googleapis.com/token'
                 }
             },
             scopes=[
@@ -25,12 +25,12 @@ class GoogleLoginRedirectView(APIView):
                 'email',
                 'profile',
             ],
-            redirect_uri=settings.GOOGLE_REDIRECT_URI,
+            redirect_uri=settings.GOOGLE_REDIRECT_URI
         )
         
         authorization_url, state = flow.authorization_url(
             access_type='offline',
-            include_granted_scopes=True,
+            include_granted_scopes='true',
             prompt='select_account'
         )
         
@@ -48,20 +48,21 @@ class GoogleOAuthCallbackView(APIView):
             {
                 'web': {
                     'client_id': settings.GOOGLE_CLIENT_ID,
-                    'client-secret': settings.GOOGLE_CLIENT_SECRET,
+                    'client_secret': settings.GOOGLE_CLIENT_SECRET,
                     'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
-                    'token_uri': 'https://oauth2/googleapis.com/token',
+                    'token_uri': 'https://oauth2.googleapis.com/token'
                 }
             },
             scopes = [
-                'open_id',
+                'openid',
                 'https://www.googleapis.com/auth/userinfo.email',
-                'https://www.googleapis.com/auth/userinfo.profile',
+                'https://www.googleapis.com/auth/userinfo.profile'
             ],
             state=state,
-            redirect_uri = settings.GOOGLE_REDIRECT_URI,
+            redirect_uri = settings.GOOGLE_REDIRECT_URI
         )
         
+        # Extracts code from callback URL --> Sends it to Google’s token endpoint
         flow.fetch_token(authorization_response=request.build_absolute_uri())
         
         # Reuse existing serializer logic
