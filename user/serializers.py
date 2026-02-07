@@ -4,6 +4,8 @@ from rest_framework import serializers
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model, authenticate
+from jwt.algorithms import RSAAlgorithm
+import jwt
 
 # OAuth2 imports
 from google.oauth2 import id_token
@@ -473,6 +475,85 @@ class LinkedInOAuthSerializer(serializers.Serializer):
         refresh = RefreshToken.for_user(user)
         
         return{
+            'user': UserProfileSerializer(user).data,
+            'is_new_user': created,
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token)
+            }
+        }
+        
+        
+class AppleOAuthSerializer(serializers.Serializer):
+    id_token = serializers.CharField(required=True)
+    user = serializers.JSONField(required=False)
+    
+    def validate(self, attrs):
+        id_token = attrs.get('id_token')
+        user_data = attrs.get('user', {})
+        
+        # Fetch Apple public keys
+        apple_public_keys = req.get('https://appleid.apple.com/auth/keys').json()
+        
+        # Extracts metadata from token [includes: kid; (key id)]
+        header = jwt.get_unverified_header(id_token)
+        
+        # Match correct public key [Apple rotates keys]
+        # This finds the exact key used to sign this token
+        key = next(
+            k for k in apple_public_keys['keys']
+            if k['kid'] == header['kid']
+        )
+        
+        # Convert JWK → RSA public key
+        public_key = RSAAlgorithm.from_jwk(key)
+        
+        # Decode & verify token
+        payload = jwt.decode(
+            id_token,
+            public_key,
+            algorithms=['RS256']
+        )
+        
+        # Extract user data
+        email = payload.get('email')
+        provider_id = payload.get('sub')    # sub → unique Apple user ID
+        
+        if not email:
+            raise serializers.ValidationError('Apple account has no email.')
+        
+        first_name = ''
+        last_name = ''
+        
+        if user_data:
+            name = user_data.get('name', {})
+            first_name = name.get('firstName', '')
+            last_name = name.get('lastName', '')
+            
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                'first_name': first_name,
+                'last_name': last_name,
+                'is_active': True,
+                'provider': AuthProvider.APPLE,
+                'provider_id': provider_id
+            }
+        )
+        
+        if created:
+            user.set_unusable_password()
+            user.save()
+        
+        if not created:
+            if user.provider == AuthProvider.SELF:
+                raise serializers.ValidationError('Account already exists. Please login with email and password')
+            if user.provider != AuthProvider.APPLE:
+                raise serializers.ValidationError(f'Account already exists. Please login with {user.provider}')
+            
+        refresh = RefreshToken.for_user(user)
+        
+        return {
             'user': UserProfileSerializer(user).data,
             'is_new_user': created,
             'tokens': {
