@@ -109,6 +109,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'user.User'
 
+# Security Settings (Data Encryption)
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT')
+SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE')
+CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE')
 
 # Google OAuth2 Settings
 SITE_ID = 1
