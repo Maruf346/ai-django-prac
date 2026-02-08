@@ -5,6 +5,8 @@ from django.conf import settings
 from django.shortcuts import redirect
 from .serializers import *
 from rest_framework.response import Response
+import jwt
+import time
 
 
 class GoogleLoginRedirectView(APIView):
@@ -132,4 +134,65 @@ class GitHubOAuthCallbackView(APIView):
         #     f'&refresh={serializer.validated_data['tokens']['refresh']}'
         #     f'&is_new={serializer.validated_data['is_new_user']}'
         # )
-            
+
+
+# helper function
+def generate_apple_client_secret():
+    return jwt.encode(
+        {
+            'iss': settings.APPLE_TEAM_ID,          # Issuer: Identifies who is signing the token
+            'iat': int(time.time()),                # Issued At (current timestamp)
+            'exp': int(time.time()) + 86400 * 180,  # Expiry time(180 days); Apple allows max 6 months
+            'aud': 'https://appleid.apple.com',     # Audience (Always fixed)
+            'sub': settings.APPLE_CLIENT_ID         # Subject: Tells Apple which app this token is for
+        },
+        settings.APPLE_PRIVATE_KEY,                 # .p8 private key (Must be kept secret)
+        algorithm='ES256',                          # Algo: Elliptic Curve signing
+        headers={'kid': settings.APPLE_KEY_ID}
+    )
+    
+
+class AppleLoginRedirectView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        params = {
+            'response_type': 'code id_token',   
+            'response_code': 'form_post',       # Apple sends response as POST form
+            'client_id': settings.APPLE_CLIENT_ID,
+            'redirect_uri': settings.APPLE_REDIRECT_URI,
+            'scope': 'name email'
+        }
+        
+        query = '&'.join(f'{k}={v}' for k, v in params.items())
+        return redirect(f'https://appleid.apple.com/auth/authorize?{query}')
+    
+    
+class AppleOAuthCallbackView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        id_token = request.data.get('id_token')
+        user = request.data.get('user')
+        
+        if not id_token:
+            return redirect(f'{settings.FRONTEND_LOGIN_ERROR_URL}?error=Apple login failed')
+        
+        try:
+            serializer = AppleOAuthCallbackView(data = {'id_token': id_token, 'user': user})
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return redirect(
+                f'{settings.FRONTEND_LOGIN_ERROR_URL}'
+                f'?error=str{e.detail[0]}'
+            )
+        
+        return Response(serializer.validated_data)
+
+        # Uncomment below to redirect to frontend with tokens in query params
+        # return redirect(
+        #     f"{settings.FRONTEND_LOGIN_SUCCESS_URL}"
+        #     f"?access={serializer.validated_data['tokens']['access']}"
+        #     f"&refresh={serializer.validated_data['tokens']['refresh']}"
+        #     f"&is_new={serializer.validated_data['is_new_user']}"
+        # )

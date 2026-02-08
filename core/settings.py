@@ -138,6 +138,14 @@ LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
 LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
 LINKEDIN_REDIRECT_URI = os.getenv('LINKEDIN_REDIRECT_URI')
 
+# Apple OAuth
+APPLE_TEAM_ID = os.getenv('APPLE_TEAM_ID')
+APPLE_PRIVATE_KEY = os.getenv('APPLE_PRIVATE_KEY')
+APPLE_KEY_ID = os.getenv('APPLE_KEY_ID')
+APPLE_CLIENT_ID = os.getenv('APPLE_CLIENT_ID')
+APPLE_REDIRECT_URI = os.getenv('APPLE_REDIRECT_URI')
+
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
