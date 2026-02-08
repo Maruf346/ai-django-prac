@@ -17,8 +17,8 @@ urlpatterns = [
     path('auth/google2/login/', GoogleLoginRedirectView.as_view(), name='google-login2'),
     path('auth/google2/callback/', GoogleOAuthCallbackView.as_view(), name='google-login2-callback'),
     
-    path("auth/apple/login/", AppleLoginRedirectView.as_view()),
-    path("auth/apple/callback/", AppleOAuthCallbackView.as_view()),
+    path("auth/apple/login/", AppleLoginRedirectView.as_view(), name='apple-login'),
+    path("auth/apple/callback/", AppleOAuthCallbackView.as_view(), name='apple-login-callback'),
     
     path('auth/github/', GitHubOAuthView.as_view(), name='github-login'),
     path('auth/github2/login', GitHubOAuthLoginRedirectView.as_view(), name='github-login2'),
