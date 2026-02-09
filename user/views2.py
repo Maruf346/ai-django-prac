@@ -348,3 +348,32 @@ class LinkedInLoginRedirectView(APIView):
         return redirect(url)
     
     
+class LinkedInOAuthCallbackView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        code = request.GET.get('code')
+        
+        if not code:
+            return redirect(
+                f'{settings.FRONTEND_LOGIN_ERROR_URL}?error=LinkedIn login failed'
+            )
+            
+        try:
+            serializer = LinkedInOAuthSerializer(data={'code': code})
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            return redirect(
+                f'{settings.FRONTEND_LOGIN_ERROR_URL}?error={str(e.detail[0])}'
+            )
+        
+        return Response(serializer.validated_data)  # comment this out when frontend is ready
+
+        # PROD mode (recommended)
+        # data = serializer.validated_data
+        # return redirect(
+        #     f"{settings.FRONTEND_LOGIN_SUCCESS_URL}"
+        #     f"?access={data['tokens']['access']}"
+        #     f"&refresh={data['tokens']['refresh']}"
+        #     f"&is_new={data['is_new_user']}"
+        # )
