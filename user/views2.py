@@ -331,3 +331,20 @@ class FacebookOAuthCallbackView(APIView):
 #   - create/login user
 #   - return JWT tokens
 #==================================================#
+class LinkedInLoginRedirectView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        params = {
+            'response_type': 'code',
+            'client_id': settings.LINKEDIN_CLIENT_ID,
+            'redirect_uri': settings.LINKEDIN_REDIRECT_URI,
+            'scope': 'openid profile email'
+        }
+        
+        query = '&'.join(f'{k}={v}' for k, v in params.items())
+        url = f'{settings.LINKEDIN_AUTHORIZE_URL}?{query}'
+        
+        return redirect(url)
+    
+    
