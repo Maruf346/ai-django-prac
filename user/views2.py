@@ -219,3 +219,59 @@ class FacebookLoginRedirectView(APIView):
         
         return redirect()
         
+
+class FacebookOAuthCallbackView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        code = request.GET.get('code')
+        
+        if not code:
+            return redirect(
+                f'{settings.FRONTEND_LOGIN_ERROR_URL}?error=Facebook login failed'
+            )
+        
+        token_params = {
+            'client_id': settings.FACEBOOK_CLIENT_ID,
+            'client_secret': settings.FACEBOOK_CLIENT_SECRET,
+            'redirect_uri': settings.FACEBOOK_REDIRECT_URI,
+            'code': code
+        }
+        
+        token_response = req.get(
+            settings.FACEBOOK_OAUTH_TOKEN_URL,
+            params=token_params,
+            timeout=5
+        )
+        
+        if token_response.status_code != 200:
+            return redirect(
+                f'{settings.FRONTEND_LOGIN_ERROR_URL}error=Failed to get Facebook access token'
+            )
+        
+        token_data = token_response.json()
+            
+        access_token = token_data.get('access_token')
+        
+        if not access_token:
+            return redirect(
+                f'{settings.FRONTEND_LOGIN_ERROR_URL}?error=Invalid Facebook access token'
+            )
+            
+        try:
+            serializer = FacebookOAuthSerializer(data={'access_token':access_token})
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            return redirect(
+                f'{settings.FRONTEND_LOGIN_ERROR_URL}?error={str(e.detail[0])}'     
+            )
+            
+        return Response(serializer.validated_data)  # comment this out when frontend is ready
+    
+        # Uncomment below to redirect to frontend with tokens in query params
+        # return redirect(
+        #     f'{settings.FRONTEND_LOGIN_SUCCESS_URL}'
+        #     f'?access={serializer.validated_data['tokens']['access']}'
+        #     f'refresh={serializer.validated_data['token']['refresh']}'
+        #     f'is_new={serializer.validated_data['is_new_user']}'
+        # )
