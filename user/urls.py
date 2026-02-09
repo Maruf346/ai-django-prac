@@ -6,29 +6,31 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 
-router.register("list", UserListViewSet, basename='user_list')
+router.register('list', UserListViewSet, basename='user_list')
 router.register('stats', UserStatsViewSet, basename='stats')
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path('', include(router.urls)),
     
     # OAuth2 logins
     path('auth/google/', GoogleOAuthView.as_view(), name='google-login'),
     path('auth/google2/login/', GoogleLoginRedirectView.as_view(), name='google-login2'),
     path('auth/google2/callback/', GoogleOAuthCallbackView.as_view(), name='google-login2-callback'),
     
-    path("auth/apple/login/", AppleLoginRedirectView.as_view(), name='apple-login'),
-    path("auth/apple/callback/", AppleOAuthCallbackView.as_view(), name='apple-login-callback'),
+    path('auth/apple/login/', AppleLoginRedirectView.as_view(), name='apple-login'),
+    path('auth/apple/callback/', AppleOAuthCallbackView.as_view(), name='apple-login-callback'),
     
     path('auth/github/', GitHubOAuthView.as_view(), name='github-login'),
     path('auth/github2/login', GitHubOAuthLoginRedirectView.as_view(), name='github-login2'),
     path('auth/github2/callback', GitHubOAuthCallbackView.as_view(), name='github-login2-callback'),
     
     path('auth/facebook/', FacebookOAuthView.as_view(), name='facebook-login'),
-    path("auth/facebook2/login/", FacebookLoginRedirectView.as_view(), name='facebook-login2'),
-    path("auth/facebook2/callback/", FacebookOAuthCallbackView.as_view(), name='facebook-login2-callback'),
+    path('auth/facebook2/login/', FacebookLoginRedirectView.as_view(), name='facebook-login2'),
+    path('auth/facebook2/callback/', FacebookOAuthCallbackView.as_view(), name='facebook-login2-callback'),
     
     path('auth/linkedin/', LinkedInOAuthView.as_view(), name='linkedin-login'),
+    path('auth/linkedin2/login/', LinkedInLoginRedirectView.as_view(), name='linkedin-login2'),
+    path('auth/linkedin2/callback/', LinkedInOAuthCallbackView.as_view(), name='linkedin-login2-callback'),
     
     # User endpoints
     path('signup/', UserSignupView.as_view(), name='signup'),

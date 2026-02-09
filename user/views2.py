@@ -369,7 +369,7 @@ class LinkedInOAuthCallbackView(APIView):
         
         return Response(serializer.validated_data)  # comment this out when frontend is ready
 
-        # PROD mode (recommended)
+        # Uncomment below to redirect to frontend with tokens in query params
         # data = serializer.validated_data
         # return redirect(
         #     f"{settings.FRONTEND_LOGIN_SUCCESS_URL}"
