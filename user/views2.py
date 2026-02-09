@@ -102,7 +102,9 @@ class GitHubOAuthLoginRedirectView(APIView):
         }
         
         query = '&'.join(f'{k}={v}' for k, v in params.items())
-        return redirect(f'https://github.com/login/oauth/authorize?{query}')
+        url = f'https://github.com/login/oauth/authorize?{query}'
+        
+        return redirect(url)
     
     
 class GitHubOAuthCallbackView(APIView):
@@ -165,7 +167,9 @@ class AppleLoginRedirectView(APIView):
         }
         
         query = '&'.join(f'{k}={v}' for k, v in params.items())
-        return redirect(f'https://appleid.apple.com/auth/authorize?{query}')
+        url = f'https://appleid.apple.com/auth/authorize?{query}'
+        
+        return redirect(url)
     
     
 class AppleOAuthCallbackView(APIView):
@@ -196,3 +200,22 @@ class AppleOAuthCallbackView(APIView):
         #     f"&refresh={serializer.validated_data['tokens']['refresh']}"
         #     f"&is_new={serializer.validated_data['is_new_user']}"
         # )
+
+
+
+class FacebookLoginRedirectView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        params = {
+            'client_id': settings.FACEBOOK_CLIENT_ID,
+            'redirect_uri': settings.FACEBOOK_REDIRECT_URI,
+            'scope': 'email,public_profile',
+            'response_type': 'code'
+        }
+        
+        query = '&'.join(f'{k}={v}' for k, v in params.items())
+        url = f'{settings.FACEBOOK_OAUTH_AUTHORIZE_URL}?{query}'
+        
+        return redirect()
+        

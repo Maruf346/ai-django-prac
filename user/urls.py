@@ -25,6 +25,8 @@ urlpatterns = [
     path('auth/github2/callback', GitHubOAuthCallbackView.as_view(), name='github-login2-callback'),
     
     path('auth/facebook/', FacebookOAuthView.as_view(), name='facebook-login'),
+    
+    
     path('auth/linkedin/', LinkedInOAuthView.as_view(), name='linkedin-login'),
     
     # User endpoints
