@@ -9,6 +9,14 @@ import jwt
 import time
 
 
+#==================================================#
+# Frontend → call backend URL
+# Backend → redirect to Google account chooser
+# User → selects Google account
+# Google → redirects back to backend
+# Backend → handles login + token generation
+# Frontend → just receives success
+#==================================================#
 class GoogleLoginRedirectView(APIView):
     permission_classes = [AllowAny]
 
@@ -89,7 +97,19 @@ class GoogleOAuthCallbackView(APIView):
         #     f'is_new={serializer.validated_data['is_new_user']}'
         # )
         
-        
+   
+#==================================================# 
+# Frontend → /auth/github/login/
+# Backend → GitHub authorize
+# User selects GitHub account
+# GitHub → /auth/github/callback/
+# Backend:
+#   - exchange code
+#   - fetch user + email
+#   - reuse serializer logic
+#   - redirect to frontend
+#==================================================#
+    
 class GitHubOAuthLoginRedirectView(APIView):
     permission_classes = [AllowAny]
     
@@ -137,6 +157,18 @@ class GitHubOAuthCallbackView(APIView):
         #     f'&is_new={serializer.validated_data['is_new_user']}'
         # )
 
+
+#==================================================#
+# Frontend → Backend login URL
+# Backend → Apple login page
+# User selects Apple ID
+# Apple → Backend callback (POST!)
+# Backend:
+#   - verifies Apple identity token
+#   - creates / logs in user
+#   - issues JWT
+#   - redirects to frontend
+#==================================================#
 
 # helper function
 def generate_apple_client_secret():
@@ -202,7 +234,17 @@ class AppleOAuthCallbackView(APIView):
         # )
 
 
-
+#==================================================#
+# Frontend → /auth/facebook/login/
+# Backend → Facebook authorize page
+# User approves Facebook login
+# Facebook → /auth/facebook/callback/?code=...
+# Backend:
+#   - exchange code → access_token
+#   - call FacebookOAuthSerializer
+#   - create/login user
+#   - redirect or return tokens
+#==================================================#
 class FacebookLoginRedirectView(APIView):
     permission_classes = [AllowAny]
     
@@ -275,3 +317,17 @@ class FacebookOAuthCallbackView(APIView):
         #     f'refresh={serializer.validated_data['token']['refresh']}'
         #     f'is_new={serializer.validated_data['is_new_user']}'
         # )
+        
+      
+#==================================================#  
+# Frontend → /auth/linkedin/login/
+# Backend → LinkedIn authorize page
+# User approves
+# LinkedIn → /auth/linkedin/callback/?code=XXX
+# Backend → LinkedInOAuthSerializer(code)
+# Serializer:
+#   - exchange code → access token
+#   - fetch user info
+#   - create/login user
+#   - return JWT tokens
+#==================================================#
