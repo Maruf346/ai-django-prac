@@ -32,7 +32,7 @@ AI based django practice codes with various tools like Stripe, Twilio etc.
 
 ## :rocket: Technologies ##
 
-The following tools were used in this project:
+The following tools were used in this project:-
 
 - [Django](https://www.djangoproject.com/)
 
